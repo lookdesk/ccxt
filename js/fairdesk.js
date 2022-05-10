@@ -499,14 +499,14 @@ module.exports = class fairdesk extends Exchange {
         market = this.safeMarket (marketId, market);
         const symbol = market['symbol'];
         const timestamp = this.safeInteger (ticker, 'timestamp');
-        const last = this.safeString (ticker, 'close');
-        const open = this.safeString (ticker, 'open');
+        const last = this.safeNumber (ticker, 'close');
+        const open = this.safeNumber (ticker, 'open');
         return this.safeTicker ({
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
-            'high': this.safeString (ticker, 'high'),
-            'low': this.safeString (ticker, 'low'),
+            'high': this.safeNumber (ticker, 'high'),
+            'low': this.safeNumber (ticker, 'low'),
             'open': open,
             'close': last,
             'last': last,
@@ -518,9 +518,9 @@ module.exports = class fairdesk extends Exchange {
             'previousClose': undefined, // previous day close
             'change': last - open,
             'percentage': (last - open) / open * 100,
-            'average': this.safeString (ticker, 'averagePrice'),
-            'baseVolume': this.safeString (ticker, 'baseVolume'),
-            'quoteVolume': this.safeString (ticker, 'quoteVolume'),
+            'average': this.safeNumber (ticker, 'averagePrice'),
+            'baseVolume': this.safeNumber (ticker, 'baseVolume'),
+            'quoteVolume': this.safeNumber (ticker, 'quoteVolume'),
             'info': ticker,
         }, market, false);
     }
