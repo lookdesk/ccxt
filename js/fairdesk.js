@@ -358,7 +358,7 @@ module.exports = class fairdesk extends Exchange {
         //         "liquidationFeeRate": 0.01
         //     },]
         // }
-        const products = response.data;
+        const products = this.safeValue (response, 'data', {});
         const result = [];
         for (let i = 0; i < products.length; i++) {
             let market = products[i];
@@ -895,7 +895,7 @@ module.exports = class fairdesk extends Exchange {
         //         "status": "NEW"
         //     }
         // }
-        if (response.status !== '0') {
+        if (this.safeString (response, 'status') !== '0') {
             return response;
         }
         const data = this.safeValue (response, 'data', {});
