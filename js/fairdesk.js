@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 
 const Exchange = require ('./base/Exchange');
-const { ExchangeError, AuthenticationError, ArgumentsRequired, BadRequest, PermissionDenied, RateLimitExceeded } = require ('./base/errors');
+const { ExchangeError, AuthenticationError, InsufficientFunds, OrderNotFound, InvalidOrder, ArgumentsRequired, BadRequest, PermissionDenied, DuplicateOrderId } = require ('./base/errors');
 const { TICK_SIZE } = require ('./base/functions/number');
 
 // ----------------------------------------------------------------------------
@@ -148,85 +148,85 @@ module.exports = class fairdesk extends Exchange {
             },
             'exceptions': {
                 'exact': {
-                    "1000" : NO_SUCH_ACCOUNT,                        // no such account.
-                    "1002" : ACCOUNT_SETTLED_CURRENCY_NOT_MATCH,     // account settled currency do not match.
-                    "1004" : MIN_LEVERAGE_RATIO,                     // leverage is too small
-                    "1005" : MAX_LEVERAGE_RATIO,                     // leverage is too large.
-                    "1006" : NEW_LEVERAGE_EQUAL_OLD,                 // leverage is equal old leverage.
-                    "1007" : MARGIN_NOT_ENOUGH,                      // margin not enough.
-                    "1008" : BALANCE_INSUFFICIENT,                   // balance insufficient.
-                    "1009" : RECHARGE_AMOUNT_ILLEGAL,                // the amount of recharge is illegal.
-                    "1010" : BALANCE_CHANGE_AMOUNT_ILLEGAL,          // the amount of balance change is illegal.
-                    "1011" : INVALID_MARGIN_CHANGE_AMOUNT,           // invalid margin change amount.
-                    "1012" : ISOLATED_LEVERAGE_REJECT_WITH_POSITION, // leverage reduction is not supported in Isolated Margin Mode with open positions.
-                    "1013" : BALANCE_VERSION_NOT_EQUAL,              // balance version not equal.
-                    "2000" : INVALID_SYMBOL_ID,                      // invalid symbol id.
-                    "2004" : DUPLICATED_ASSET_NAME,                  // duplicated asset name
-                    "2005" : DUPLICATED_ASSET_ID,                    // duplicated asset id
-                    "2006" : INVALID_ASSET_ID,                       // invalid asset id.
-                    "4000" : NO_SUCH_ORDER,                          // no such order.
-                    "4001" : PRICE_MISSING,                          // price is missing.
-                    "4002" : QTY_MISSING,                            // qty is missing.
-                    "4003" : INVALID_QTY,                            // qty is invalid.
-                    "4004" : INVALID_CURRENCY_ID,                    // invalid currency id.
-                    "4005" : UNABLE_TO_FILL,                         // unable to fill.
-                    "4006" : ORDER_WOULD_IMMEDIATELY_TRIGGER,        // order would immediately trigger.
-                    "4007" : REDUCE_ONLY_REJECT,                     // reduce only reject.
-                    "4008" : POSITION_NOT_SUFFICIENT,                // position is not sufficient.
-                    "4009" : REDUCE_ONLY_BUY_ERROR,                  // reduce only rejected, position more than 0 while buy.
-                    "4010" : REDUCE_ONLY_SELL_ERROR,                 // reduce only rejected, position less than 0 while sell.
-                    "4011" : MAX_OPEN_ORDER_LIMIT,                   // max open order limit.
-                    "4012" : MAX_CONDITIONAL_ORDER_LIMIT,            // max conditional order limit.
-                    "4013" : INVALID_CONDITIONAL_ORDER,              // conditional order is invalid.
-                    "4014" : CLI_ORD_ID_DUPLICATE,                   // clientOrderId duplicated.
-                    "4015" : REDUCE_ONLY_ILLEGAL,                    // reduce only reject, order type not supported.
-                    "4020" : CANCEL_REJECTED,                        // unknown order sent.
-                    "4021" : UNKNOWN_UPDATE_TYPE,                    // unknown update type.
-                    "4030" : REDUCE_ONLY_MARGIN_CHECK_FAILED,        // reduceOnly order Failed. please check your existing position and open orders.
-                    "4040" : UNABLE_TO_PARSE_ORDER,                  // unable to parse order.
-                    "4050" : MARKET_ORDER_REJECT,                    // the counter party's best price does not meet the PERCENT_PRICE filter limit.
-                    "4051" : ORDER_PRICE_RANGE_REJECT,               // order price not in the proper range.
-                    "4060" : TRIGGER_PRICE_MISSING,                  // trigger price is missing.
-                    "4070" : NO_OPEN_ORDER,                          // no open orders to close
-                    "4071" : ORDER_ID_DUPLICATE,                     // order id duplicated.
-                    "5000" : INVALID_POSITION_SIDE,                  // positionSide is not valid.
-                    "5001" : POSITION_SIDE_NOT_MATCH,                // positionSide does not match with userSetting.
-                    "5002" : ADD_ISOLATED_MARGIN_NO_POSITION_REJECT, // isolated position quantity should more than 0 when add margin.
-                    "5003" : NO_BALANCE_FOR_ADD_MARGIN,              // No balance for add position margin.
-                    "5004" : POSITION_MARGIN_CAN_NOT_DECREASE,       // Position margin can not decrease.
-                    "100" :  TIMEOUT,                                // Request time out.
-                    "200" :  PRICE_LESS_THAN_ZERO,                   // Price less than 0.
-                    "201" :  PRICE_LESS_THAN_MIN_PRICE,              // Price less than min price.
-                    "202" :  PRICE_GREATER_THAN_MAX_PRICE,           // Price greater than max price.
-                    "203" :  PRICE_NOT_INCREASED_BY_TICK_SIZE,       // Price not increased by tick size.
-                    "204" :  QTY_LESS_THAN_ZERO,                     // Quantity less than zero.
-                    "205" :  QTY_GREATER_THAN_MAX_QTY,               // Quantity greater than max quantity.
-                    "206" :  QTY_LESS_THAN_MIN_QTY,                  // Quantity less than min quantity.
-                    "207" :  QTY_NOT_INCREASED_BY_STEP_SIZE,         // Qty not increased by step size.
-                    "208" :  TRIGGER_PRICE_LESS_THAN_ZERO,           // Trigger price less than zero.
-                    "209" :  TRIGGER_PRICE_GREATER_THAN_MAX_PRICE,   // Trigger price greater than max price.
-                    "210" :  PRICE_TRIGGER_TYPE_IS_NULL_OR_ILLEGAL,  // Price trigger type is null or illegal.
-                    "211" :  NOT_SUPPORT_ORDER_TYPE,                 // not support order type.
-                    "212" :  INVALID_CL_ORD_ID_LEN,                  // client order length is not valid.
-                    "213" :  INVALID_CL_ORD_ID,                      // client order id is not valid.
-                    "214" :  CL_ORD_ID_ILLEGAL_CHARS,                // Illegal characters found in a parameter.
-                    "216" :  MANDATORY_PARAM_EMPTY_OR_MALFORMED,     // Mandatory parameter {%s} was not sent, was empty/null, or malformed.
-                    "217" :  PARAM_NOT_REQUIRED,                     // Parameter '%s' not required.
-                    "218" :  INVALID_SIDE,                           // Invalid side.
-                    "219" :  OPTIONAL_PARAMS_BAD_COMBO,              // Combination of optional parameters '%s' invalid.
-                    "220" :  INVALID_PRICE_RANGE,                    // price range not valid
-                    "221" :  QTY_TOO_LARGE,                          // Qty too large.
-                    "250" :  INVALID_CURRENCY,                       // invalid currency.
-                    "300" :  INVALID_SYMBOL,                         // invalid symbol.
-                    "301" :  SYMBOL_CAN_NOT_TRADING,                 // symbol can not trading now.
-                    "302" :  SYMBOL_ORDER_CAN_NOT_CANCEL,            // symbol order can not cancel now.
-                    "400" :  INVALID_ACCOUNT,                        // invalid account.
-                    "401" :  ACCOUNT_CAN_NOT_TRADE,                  // account could not trade.
-                    "402" :  INVALID_LEVERAGE,                       // invalid leverage.
-                    "403" :  INVALID_USER_ID,                        // invalid user id.
-                    "405" :  INVALID_WITHDRAW_BALANCE,               // invalid withdraw balance.
-                    "408" :  ACCOUNT_MARGIN_NOT_ENOUGH,              // account margin not enough.
-                    "501" :  WALLET_INSUFFICIENT_BALANCE             // wallet insufficient balance
+                    '1000': BadRequest,         // no such account.
+                    '1002': BadRequest,         // account settled currency do not match.
+                    '1004': BadRequest,         // leverage is too small
+                    '1005': BadRequest,         // leverage is too large.
+                    '1006': BadRequest,         // leverage is equal old leverage.
+                    '1007': InsufficientFunds,  // margin not enough.
+                    '1008': InsufficientFunds,  // balance insufficient.
+                    '1009': BadRequest,         // the amount of recharge is illegal.
+                    '1010': BadRequest,         // the amount of balance change is illegal.
+                    '1011': InsufficientFunds,  // invalid margin change amount.
+                    '1012': ExchangeError,      // leverage reduction is not supported in Isolated Margin Mode with open positions.
+                    '1013': BadRequest,         // balance version not equal.
+                    '2000': InvalidOrder,       // invalid symbol id.
+                    '2004': DuplicateOrderId,   // duplicated asset name
+                    '2005': BadRequest,         // duplicated asset id
+                    '2006': BadRequest,         // invalid asset id.
+                    '4000': OrderNotFound,      // no such order.
+                    '4001': ArgumentsRequired,  // price is missing.
+                    '4002': ArgumentsRequired,  // qty is missing.
+                    '4003': InvalidOrder,       // qty is invalid.
+                    '4004': BadRequest,         // invalid currency id.
+                    '4005': ExchangeError,      // unable to fill.
+                    '4006': InvalidOrder,       // order would immediately trigger.
+                    '4007': InvalidOrder,       // reduce only reject.
+                    '4008': BadRequest,         // position is not sufficient.
+                    '4009': InvalidOrder,       // reduce only rejected, position more than 0 while buy.
+                    '4010': InvalidOrder,       // reduce only rejected, position less than 0 while sell.
+                    '4011': ExchangeError,      // max open order limit.
+                    '4012': ExchangeError,      // max conditional order limit.
+                    '4013': InvalidOrder,       // conditional order is invalid.
+                    '4014': InvalidOrder,       // clientOrderId duplicated.
+                    '4015': InvalidOrder,       // reduce only reject, order type not supported.
+                    '4020': OrderNotFound,      // unknown order sent.
+                    '4021': BadRequest,         // unknown update type.
+                    '4030': InvalidOrder,       // reduceOnly order Failed. please check your existing position and open orders.
+                    '4040': InvalidOrder,       // unable to parse order.
+                    '4050': ExchangeError,      // the counter party's best price does not meet the PERCENT_PRICE filter limit.
+                    '4051': ExchangeError,      // order price not in the proper range.
+                    '4060': InvalidOrder,       // trigger price is missing.
+                    '4070': OrderNotFound,      // no open orders to close
+                    '4071': InvalidOrder,       // order id duplicated.
+                    '5000': InvalidOrder,       // positionSide is not valid.
+                    '5001': InvalidOrder,       // positionSide does not match with userSetting.
+                    '5002': BadRequest,         // isolated position quantity should more than 0 when add margin.
+                    '5003': InsufficientFunds,  // No balance for add position margin.
+                    '5004': BadRequest,         // Position margin can not decrease.
+                    '100': ExchangeError,       // Request time out.
+                    '200': InvalidOrder,        // Price less than 0.
+                    '201': InvalidOrder,        // Price less than min price.
+                    '202': InvalidOrder,        // Price greater than max price.
+                    '203': InvalidOrder,        // Price not increased by tick size.
+                    '204': InvalidOrder,        // Quantity less than zero.
+                    '205': InvalidOrder,        // Quantity greater than max quantity.
+                    '206': InvalidOrder,        // Quantity less than min quantity.
+                    '207': InvalidOrder,        // Qty not increased by step size.
+                    '208': InvalidOrder,        // Trigger price less than zero.
+                    '209': InvalidOrder,        // Trigger price greater than max price.
+                    '210': InvalidOrder,        // Price trigger type is null or illegal.
+                    '211': InvalidOrder,        // not support order type.
+                    '212': InvalidOrder,        // client order length is not valid.
+                    '213': InvalidOrder,        // client order id is not valid.
+                    '214': InvalidOrder,        // Illegal characters found in a parameter.
+                    '216': ArgumentsRequired,   // Mandatory parameter {%s} was not sent, was empty/null, or malformed.
+                    '217': BadRequest,          // Parameter '%s' not required.
+                    '218': BadRequest,          // Invalid side.
+                    '219': BadRequest,          // Combination of optional parameters '%s' invalid.
+                    '220': InvalidOrder,        // price range not valid
+                    '221': InvalidOrder,        // Qty too large.
+                    '250': InvalidOrder,        // invalid currency.
+                    '300': InvalidOrder,        // invalid symbol.
+                    '301': ExchangeError,       // symbol can not trading now.
+                    '302': ExchangeError,       // symbol order can not cancel now.
+                    '400': ExchangeError,       // invalid account.
+                    '401': ExchangeError,       // account could not trade.
+                    '402': ExchangeError,       // invalid leverage.
+                    '403': ExchangeError,       // invalid user id.
+                    '405': BadRequest,          // invalid withdraw balance.
+                    '408': InsufficientFunds,   // account margin not enough.
+                    '501': InsufficientFunds,   // wallet insufficient balance
                 },
                 'broad': {
                     '401 Insufficient privilege': PermissionDenied, // {"code": "401","msg": "401 Insufficient privilege."}
@@ -291,8 +291,8 @@ module.exports = class fairdesk extends Exchange {
             'option': false,
             'active': true,
             'contract': false,
-            'linear': true,
-            'inverse': false,
+            'linear': undefined,
+            'inverse': undefined,
             'taker': this.parseNumber (this.safeString (market, 'takerFeeRate')),
             'maker': this.parseNumber (this.safeString (market, 'makerFeeRate')),
             'contractSize': undefined,
@@ -358,7 +358,7 @@ module.exports = class fairdesk extends Exchange {
         //         "liquidationFeeRate": 0.01
         //     },]
         // }
-        const products = response.data;
+        const products = this.safeValue (response, 'data', {});
         const result = [];
         for (let i = 0; i < products.length; i++) {
             let market = products[i];
@@ -425,7 +425,7 @@ module.exports = class fairdesk extends Exchange {
         //     }
         //   }
         const result = this.safeValue (response, 'data', {});
-        const timestamp = this.safeIntegerProduct (result, 'timestamp', 0.000001);
+        const timestamp = this.safeInteger (result, 'timestamp');
         return this.parseOrderBook (result, symbol, timestamp, 'bids', 'asks', 0, 1, market);
     }
 
@@ -498,26 +498,28 @@ module.exports = class fairdesk extends Exchange {
         const marketId = this.safeString (ticker, 'symbol');
         market = this.safeMarket (marketId, market);
         const symbol = market['symbol'];
-        const timestamp = this.parseNumber (this.safeString (ticker, 'timestamp'));
-        const last = this.safeString (ticker, 'close');
-        const open = this.safeString (ticker, 'open');
+        const timestamp = this.safeInteger (ticker, 'timestamp');
+        const last = this.safeNumber (ticker, 'close');
+        const open = this.safeNumber (ticker, 'open');
+        const change = last - open;
+        const percentage = ((last - open) / open) * 100;
         return this.safeTicker ({
             'symbol': symbol,
             'timestamp': timestamp,
             'datetime': this.iso8601 (timestamp),
             'high': this.safeString (ticker, 'high'),
             'low': this.safeString (ticker, 'low'),
-            'open': open,
-            'close': last,
-            'last': last,
+            'open': open.toString (),
+            'close': last.toString (),
+            'last': last.toString (),
             'bid': undefined,
             'bidVolume': undefined,
             'ask': undefined,
             'askVolume': undefined,
             'vwap': undefined,
             'previousClose': undefined, // previous day close
-            'change': last - open,
-            'percentage': (last - open) / open * 100,
+            'change': change.toString (),
+            'percentage': percentage.toString (),
             'average': this.safeString (ticker, 'averagePrice'),
             'baseVolume': this.safeString (ticker, 'baseVolume'),
             'quoteVolume': this.safeString (ticker, 'quoteVolume'),
@@ -615,33 +617,38 @@ module.exports = class fairdesk extends Exchange {
         return result;
     }
 
-
     parsePubTrade (trade, market = undefined) {
         const symbol = market['symbol'];
-        const timestamp = this.safeNumber (trade, 'timestamp');
+        const timestamp = this.safeInteger (trade, 'timestamp');
         return {
             'info': trade,
             'id': this.safeString (trade, 'tradeId'),
             'symbol': symbol,
             'order': this.safeString (trade, 'orderId'),
-            'price': this.safeString (trade, 'price'),
-            'amount': this.safeString (trade, 'qty'),
+            'price': this.safeNumber (trade, 'price'),
+            'amount': this.safeNumber (trade, 'qty'),
             'takerOrMaker': 'taker',
             'type': undefined,
             'side': undefined,
             'cost': undefined,
             'fee': undefined,
             'timestamp': timestamp,
-            'datetime': this.iso8601 (timestamp)
+            'datetime': this.iso8601 (timestamp),
         };
     }
 
     parseMyTrade (trade, market = undefined) {
         const symbol = market['symbol'];
-        const timestamp = this.safeNumber (trade, 'timestamp');
+        const timestamp = this.safeInteger (trade, 'timestamp');
         const isMaker = this.safeValue (trade, 'maker');
         const side = this.safeStringLower (trade, 'side');
         const positionSide = this.safeStringLower (trade, 'positionSide');
+        let takerOrMaker = '';
+        if (isMaker) {
+            takerOrMaker = 'maker';
+        } else {
+            takerOrMaker = 'taker';
+        }
         return {
             'info': trade,
             'id': this.safeString (trade, 'tradeId'),
@@ -650,22 +657,21 @@ module.exports = class fairdesk extends Exchange {
             'type': undefined,
             'side': side,
             'positionSide': positionSide,
-            'takerOrMaker': isMaker ? "maker" : "taker",
+            'takerOrMaker': takerOrMaker,
             'price': this.safeString (trade, 'lastPrice'),
             'amount': this.safeString (trade, 'lastQty'),
             'cost': undefined,
             'fee': undefined,
             'timestamp': timestamp,
-            'datetime': this.iso8601 (timestamp)
+            'datetime': this.iso8601 (timestamp),
         };
     }
 
     parseSwapBalance (response) {
-        const data = this.safeValue (response, 'data', {});
-        const balance = this.safeValue (data, 'accounts', {})[0];
-        const free = this.safeNumber (balance, 'availBalance');
-        const used = this.safeNumber (balance, 'positionMargin');
-        const total = this.safeNumber (balance, 'accountBalance');
+        const balance = this.safeValue (response, 'data', [])[0];
+        const total = this.safeNumber (balance, 'balance');
+        const free = this.safeNumber (balance, 'crossBalance');
+        const used = total - free;
         return {
             'info': balance,
             'USDT': {
@@ -680,7 +686,6 @@ module.exports = class fairdesk extends Exchange {
     }
 
     async fetchBalance (params = {}) {
-        await this.loadMarkets ();
         const request = {};
         const response = await this.privateGetAccountBalance (this.extend (request, params));
         // {
@@ -736,32 +741,33 @@ module.exports = class fairdesk extends Exchange {
         return result;
     }
 
+    parseStatus (order) {
+        let value = '';
+        if (this.safeString (order, 'status') === 'FILLED') {
+            value = 'closed';
+        }
+        if (this.safeString (order, 'status') === 'CANCELED') {
+            value = 'canceled';
+        }
+        if (this.safeString (order, 'status') === 'EXPIRED') {
+            value = 'expired';
+        }
+        if (this.safeString (order, 'status') === 'NEW') {
+            value = 'open';
+        }
+        return value;
+    }
+
     parseOrder (order, market = undefined) {
         const symbol = this.safeString (order, 'symbol');
-        const state = () => {
-            let value = '';
-            if (this.safeString (order, 'status') === 'FILLED') {
-                value = 'closed';
-            }
-            if (this.safeString (order, 'status') === 'CANCELED') {
-                value = 'canceled';
-            }
-            if (this.safeString (order, 'status') === 'EXPIRED') {
-                value = 'expired';
-            }
-            if (this.safeString (order, 'status') === 'NEW') {
-                value = 'open';
-            }
-            return value;
-        };
-        const status = state (); // 'open', 'closed', 'canceled', 'expired', 'rejected'
+        const status = this.parseStatus (order); // 'open', 'closed', 'canceled', 'expired', 'rejected'
         const side = this.safeStringLower (order, 'side');
         const positionSide = this.safeStringLower (order, 'positionSide');
         const type = this.parseOrderType (this.safeString (order, 'type'));
         const price = this.parseNumber (this.safeString (order, 'price') === '--' ? '' : this.safeString (order, 'price'));
         const amount = this.safeNumber (order, 'origQty');
         const remaining = amount - this.safeNumber (order, 'executedQty');
-        const timestamp = this.safeNumber (order, 'transactTime');
+        const timestamp = this.safeInteger (order, 'transactTime');
         const timeInForce = this.parseTimeInForce (this.safeString (order, 'timeInForce'));
         return {
             'info': order,
@@ -803,7 +809,7 @@ module.exports = class fairdesk extends Exchange {
             'quantity': amount,
             'side': sideValue, // SELL, BUY
             'type': type.toLocaleUpperCase (), // MARKET, LIMIT
-            'clientOrderId': `CCXT_${this.uuid ()}`,
+            'clientOrderId': 'CCXT_' + this.uuid (),
             'orderRespType': 'ACK',
             'positionSide': params.positionSide || (sideValue === 'BUY' ? 'LONG' : 'SHORT'),
             'isolated': params.isolated || false,
@@ -897,7 +903,7 @@ module.exports = class fairdesk extends Exchange {
         //         "status": "NEW"
         //     }
         // }
-        if (response.status !== '0') {
+        if (this.safeString (response, 'status') !== '0') {
             return response;
         }
         const data = this.safeValue (response, 'data', {});
@@ -1339,8 +1345,8 @@ module.exports = class fairdesk extends Exchange {
         const margin = this.safeString (position, 'margin');
         const positionSide = this.safeStringLower (position, 'positionSide');
         const marginType = this.safeString (position, 'isolated') === 'true' ? 'isolated' : 'cross';
-        const timestamp = this.parseNumber (this.safeString (position, 'lastTxTime'));
-        const qty = this.parseNumber(this.safeString(position, 'quantity'));
+        const timestamp = this.safeInteger (position, 'lastTxTime');
+        const qty = this.parseNumber (this.safeString (position, 'quantity'));
         const entryPrice = this.parseNumber (this.safeString (position, 'avgEntryPrice'));
         const markPrice = this.parseNumber (this.safeString (position, 'markPrice'));
         const notional = qty * markPrice;
